@@ -2,7 +2,8 @@ import json
 import os
 import sys
 
-fileName="Luggage.json"
+fileName=sys.argv[1]
+input(fileName)
 #fileName="{}/{}".format(os.getcwd(),__file__)
 
 try:
