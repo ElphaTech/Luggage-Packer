@@ -2,8 +2,8 @@ import json
 import os
 import sys
 
-directory_path = os.getcwd()
 fileName="Luggage.json"
+#fileName="{}/{}".format(os.getcwd(),__file__)
 
 try:
     importedJson=open(fileName,"r")
@@ -19,12 +19,39 @@ def saveLuggage():
     importedJson.write(json.dumps(Luggage))
     importedJson.close()
 
-def printMatchingItems(s,l,p):
+
+def printMatchingItems(s,l,p:str="/",m:bool=False): #search term,location,seperator,true if main run
+    searchList=[]
     for i in range(len(l["Items"])):
         if s.upper() in l["Items"][i]["Name"].upper():
-            print("{0}: {1}".format(l["Items"][i]["Name"],p))
+            searchList.append("{0}: {1}".format(l["Items"][i]["Name"],p))
     for i in range(len(l["Folders"])):
-        printMatchingItems(s,l["Folders"][i],"{0}{1}/".format(p,l["Folders"][i]["Name"]))
+        tempSearchList=printMatchingItems(s,l["Folders"][i],"{0}{1}/".format(p,l["Folders"][i]["Name"]))
+        for j in tempSearchList:
+            searchList.append(j)
+    if m:
+        global packstat
+        if len(searchList)>0:
+            for i in range(len(searchList)):
+                print("{}: {}".format(i+1,searchList[i]))
+            inputSearch=input("Type number to quick jump to item or enter to get back to your regularly scheduled programming")
+            dirstr=str(searchList[int(inputSearch)-1]).split(": ")[1][1:]
+            dirlist=dirstr.split("/")[:-1]
+            while len(dirlist)!=0:
+                for i in range(len(Location[-1]["Folders"])):
+                    if Location[-1]["Folders"][i]["Name"]==dirlist[0]:
+                        if len(dirlist)==1:
+                            if Location[-1]["Folders"][i]["Packed"]!=packstat:
+                                if packstat==False:
+                                    packstat=True
+                                else:
+                                    packstat=False
+                        Location.append(Location[-1]["Folders"][i])
+                        dirlist.pop(0)
+        else:
+            print("No results found")
+    else:
+        return searchList
 
 def checkFolderItem(fi):
     if fi=="f":
@@ -73,7 +100,6 @@ HelpList=[
     "",
     "",
     "h: Shows help(This)",
-    "r: Restarts Script",
     "",
     "s[name]: Searches for item",
     "",
@@ -93,9 +119,9 @@ os.system("clear")
 
 while True:
     if packstat==False:
-        print("\n------------------\n{}- Not Packed\nFolders:".format(Location[-1]["Name"]))
+        print("\n------------------\n{} - Not Packed\nFolders:".format(Location[-1]["Name"]))
     else:
-        print("\n------------------\n{}- Packed\nFolders:".format(Location[-1]["Name"]))
+        print("\n------------------\n{} - Packed\nFolders:".format(Location[-1]["Name"]))
 
     for i in range(len(Location[-1]["Folders"])):
         if Location[-1]["Folders"][i]["Packed"]==packstat:
@@ -103,18 +129,19 @@ while True:
     print("Items:")
     for i in range(len(Location[-1]["Items"])):
         if Location[-1]["Items"][i]["Packed"]==packstat:
-            print("i{}: {}".format(i+1,Location[-1]["Items"][i]["Name"]))
-    print("Type h for help")
+            print("i{}: {}".format(f"{i+1:02}",Location[-1]["Items"][i]["Name"]))
 
-
-    input1=input()
+    input1=input("Type h for help\n> ")
     os.system("clear")
 
     if input1=="h":
         for i in HelpList:
             print(i)
     elif input1[:1]=="s":
-        printMatchingItems(removeSpaces(input1[1:]),Location[-1],"/")
+        printMatchingItems(removeSpaces(input1[1:]),Location[-1],"/",True)
+    elif input1=="reboot":
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
 
     elif input1=="cv":
         if packstat==False:
@@ -122,16 +149,12 @@ while True:
         else:
             packstat=False
     elif input1[:1]=="p":
-        spl=input1.split(",")
-        spl.pop(0)
+        findex=input1.split(",")
+        findex[0]=findex[0][2:]
         fi=input1[1:2]
-        findex=[input1[2:3]]
-        if len(spl)>1:
-            for i in spl:
-                findex.append(i)
         for i in range(len(findex)):
             if checkIfOk(findex[i],fi):
-                if Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]==True:
+                if Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]:
                     Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=False
                 else:
                     Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=True
@@ -187,6 +210,4 @@ while True:
             print("!: Please use ,[name] to rename")
 
     saveLuggage()
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
 print("OUT")
