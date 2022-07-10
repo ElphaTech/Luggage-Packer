@@ -1,1 +1,51 @@
-{"Name": "Luggage", "Folders": [], "Items": []}
+{
+  "Name": "Luggage",
+  "Folders": [
+    {
+      "Name": "e",
+      "Packed": false,
+      "Folders": [],
+      "Items": []
+    },
+    {
+      "Name": "bob",
+      "Packed": false,
+      "Folders": [],
+      "Items": []
+    }
+  ],
+  "Items": [
+    {
+      "Name": "e",
+      "Packed": true
+    },
+    {
+      "Name": "r",
+      "Packed": true
+    },
+    {
+      "Name": "fjdshkjfdh",
+      "Packed": true
+    },
+    {
+      "Name": "hsjf",
+      "Packed": true
+    },
+    {
+      "Name": "eyuhfs",
+      "Packed": false
+    },
+    {
+      "Name": "potst",
+      "Packed": false
+    },
+    {
+      "Name": "Bf",
+      "Packed": false
+    },
+    {
+      "Name": "Big Item",
+      "Packed": false
+    }
+  ]
+}
