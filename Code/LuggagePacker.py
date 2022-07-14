@@ -1,10 +1,17 @@
+from fileinput import filename
 import json
 import os
 import sys
 
-fileName=sys.argv[1]
-input(fileName)
-#fileName="{}/{}".format(os.getcwd(),__file__)
+fileName=input("What is the filename?(_.json)")
+if fileName=="":
+    fileName="Luggage.json"
+elif len(fileName)<5:
+    fileName="{}.json".format(fileName)
+    input(fileName)
+elif fileName[-5:]!=".json":
+    fileName="{}.json".format(fileName)
+    input(fileName)
 
 try:
     importedJson=open(fileName,"r")
@@ -132,25 +139,31 @@ while True:
         if Location[-1]["Items"][i]["Packed"]==packstat:
             print("i{}: {}".format(f"{i+1:02}",Location[-1]["Items"][i]["Name"]))
 
-    input1=input("Type h for help\n> ")
+    input1=input("Type h for help\nCommand: ")
+    waiting=False
+
+
     os.system("clear")
 
     if input1=="h":
         for i in HelpList:
             print(i)
-    elif input1[:1]=="s":
-        printMatchingItems(removeSpaces(input1[1:]),Location[-1],"/",True)
-    elif input1=="reboot":
-        python = sys.executable
-        os.execl(python, python, * sys.argv)
+
+    elif input1=="s":
+        printMatchingItems(removeSpaces(input("Search term: ")),Location[-1],"/",True)
+
+    #elif input1=="reboot":
+        #python = sys.executable
+        #os.execl(python, python, * sys.argv)
 
     elif input1=="cv":
         if packstat==False:
             packstat=True
         else:
             packstat=False
-    elif input1[:1]=="p":
-        findex=input1.split(",")
+
+    elif input1=="p":
+        findex=input("Items to pack: ").split(",")
         findex[0]=findex[0][2:]
         fi=input1[1:2]
         for i in range(len(findex)):
@@ -159,25 +172,30 @@ while True:
                     Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=False
                 else:
                     Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=True
-    elif input1[:1]=="o":
-        if input1[1:2]=="p":
+
+    elif input1=="o":
+        packInput1=input("Pack or unpack: ")
+        if packInput1=="p":
             pu=True
-        elif input1[1:2]=="u":
+        elif packInput1=="u":
             pu=False
         else:
             print("!: Please use p/u to specify pack or unpack")
             pass
-        if len(input1)==2:
+        packInput2=input("Effect folders, items or both(f,i,): ")
+        if packInput2=="":
             for i in range(len(Location[-1]["Folders"])):
                 Location[-1]["Folders"][i]["Packed"]=pu
             for i in range(len(Location[-1]["Items"])):
                 Location[-1]["Items"][i]["Packed"]=pu
-        elif len(input1)==3 and checkFolderItem(input1[2:3])!=False:
-            for i in range(len(Location[-1][checkFolderItem(input1[2:3])])):
-                Location[-1][checkFolderItem(input1[2:3])][i]["Packed"]=pu
+        elif checkFolderItem(packInput2)!=False:
+            for i in range(len(Location[-1][checkFolderItem(packInput2)])):
+                Location[-1][checkFolderItem(packInput2)][i]["Packed"]=pu
+        else:
+            print("!: Please use f/i/(nothing) to specify folders, items or all")
 
-    elif input1[:1]=="f":
-        findex=int(input1[1:])
+    elif input1=="f":
+        findex=int(input("Folder number to enter: "))
         if checkIfOk(findex,"f"):
             Location.append(Location[-1]["Folders"][findex-1])
 
@@ -187,28 +205,27 @@ while True:
         else:
             print("Already in top folder")
 
-    elif input1[:1]=="a":
-        if input1[1:2]=="i":
-            Location[-1]["Items"].append({"Name":removeSpaces(input1[2:]),"Packed":packstat})
-        elif input1[1:2]=="f":
-            Location[-1]["Folders"].append({"Name":removeSpaces(input1[2:]),"Packed":packstat,"Folders":[],"Items":[]})
+    elif input1=="a":
+        fi=checkFolderItem(input("Add folder or item(f/i): "))
+        addInputName=removeSpaces(input("Name: "))
+        if fi=="Items":
+            Location[-1]["Items"].append({"Name":addInputName,"Packed":packstat})
+        elif fi=="Folders":
+            Location[-1]["Folders"].append({"Name":addInputName,"Packed":packstat,"Folders":[],"Items":[]})
         else:
-            print("Please write command:a[f/i][name]")
+            print("!: Please use f/i to specify folder or item")
 
-    elif input1[:1]=="d":
-        findex=input1[2:]
-        fi=input1[1:2]
+    elif input1=="d":
+        fi=checkFolderItem(input("Add folder or item(f/i): "))
+        findex=int(input("Folder number to enter: "))
         if checkIfOk(findex,fi):
             del Location[-1][checkFolderItem(fi)][int(findex)-1]
 
-    elif input1[:1]=="r":
-        spl=input1.split(",")
-        findex=spl[0][2:]
-        fi=input1[1:2]
-        if checkIfOk(findex,fi) and len(spl)>1:
-            Location[-1][checkFolderItem(fi)][int(findex)-1]["Name"]=removeSpaces(spl[1])
-        elif len(spl)>1:
-            print("!: Please use ,[name] to rename")
+    elif input1=="r":
+        fi=checkFolderItem(input("Add folder or item(f/i): "))
+        findex=int(input("Folder number to enter: "))
+        name=removeSpaces(input("Name: "))
+        Location[-1][checkFolderItem(fi)][int(findex)-1]["Name"]=name
 
     saveLuggage()
 print("OUT")
