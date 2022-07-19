@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-fileName=input("What is the filename?(_.json)")
+fileName=input("What is the filename?(_.json): ")
 if fileName=="":
     fileName="Luggage.json"
 elif len(fileName)<5:
@@ -126,6 +126,7 @@ HelpList=[
 os.system("clear")
 
 while True:
+    os.system("clear")
     if packstat==False:
         print("\n------------------\n{} - Not Packed\nFolders:".format(Location[-1]["Name"]))
     else:
