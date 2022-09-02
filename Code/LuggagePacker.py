@@ -169,10 +169,10 @@ while True:
         fi=input1[1:2]
         for i in range(len(findex)):
             if checkIfOk(findex[i],fi):
-                if Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]:
-                    Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=False
+                if Location[-1][fi][int(findex[i-1])-1]["Packed"]:
+                    Location[-1][fi][int(findex[i-1])-1]["Packed"]=False
                 else:
-                    Location[-1][checkFolderItem(fi)][int(findex[i-1])-1]["Packed"]=True
+                    Location[-1][fi][int(findex[i-1])-1]["Packed"]=True
 
     elif input1=="o":
         packInput1=input("Pack or unpack: ")
@@ -220,13 +220,23 @@ while True:
         fi=checkFolderItem(input("Add folder or item(f/i): "))
         findex=int(input("Folder number to enter: "))
         if checkIfOk(findex,fi):
-            del Location[-1][checkFolderItem(fi)][int(findex)-1]
+            del Location[-1][fi][int(findex)-1]
 
     elif input1=="r":
         fi=checkFolderItem(input("Add folder or item(f/i): "))
         findex=int(input("Folder number to enter: "))
         name=removeSpaces(input("Name: "))
-        Location[-1][checkFolderItem(fi)][int(findex)-1]["Name"]=name
+        Location[-1][fi][int(findex)-1]["Name"]=name
+
+    elif input1=="v":
+        fi=checkFolderItem(input("Add folder or item(f/i): "))
+        findex=int(input("{} number to enter: ".format(fi[:-1])))
+        print("Name: {}".format(Location[-1][fi][int(findex)-1]["Name"]))
+        print("Is packed: {}".format(Location[-1][fi][int(findex)-1]["Packed"]))
+        if fi=="Folders":
+            print("Folders contained: {}".format(len(Location[-1]["Folders"][int(findex)-1]["Folders"])))
+            print("Items contained: {}".format(len(Location[-1]["Folders"][int(findex)-1]["Items"])))
 
     saveLuggage()
+    input()
 print("OUT")
